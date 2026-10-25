@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Ventas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { 
+            background: linear-gradient(135deg, #0f172a, #1e293b); 
+            min-height: 100vh; 
+            color: #f8fafc; 
+        }
+
+        
+        header {
+            background: linear-gradient(90deg, #1e3a5f 0%, #0c4a6e 50%, #1e3a5f 100%);
+            padding: 2rem 3rem;
+            border-bottom: 3px solid #38bdf8;
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.25), 
+                        0 0 40px rgba(56, 189, 248, 0.1) inset;
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -50%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+            animation: brillo 3.5s infinite;
+        }
+        @keyframes brillo {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+        }
+        .header-contenido {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .header-nombre {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #fef08a;
+            text-shadow: 0 0 10px rgba(254, 240, 138, 0.3);
+            letter-spacing: 0.5px;
+        }
+        .header-titulo {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+            letter-spacing: 1px;
+        }
+        .header-subtitulo {
+            font-size: 0.95rem;
+            color: #bae6fd;
+            margin-top: 0.3rem;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .card { 
+            background: rgba(255,255,255,0.04); 
+            border-radius: 16px; 
+            padding: 2rem; 
+            margin-bottom: 2rem; 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 { 
+            color: #7dd3fc; 
+            margin-bottom: 1rem; 
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2); 
+            padding-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 1.5rem; 
+        }
+        .stat { 
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(14, 165, 233, 0.05));
+            padding: 1.8rem; 
+            border-radius: 12px; 
+            text-align: center; 
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .stat:hover { transform: translateY(-4px); }
+        .stat h3 { 
+            font-size: 1rem; 
+            color: #94a3b8; 
+            margin-bottom: 0.5rem; 
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+        .stat p { 
+            font-size: 1.8rem; 
+            font-weight: bold; 
+            color: #fef08a; 
+            text-shadow: 0 0 8px rgba(254, 240, 138, 0.25);
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 1rem; 
+        }
+        th, td { 
+            padding: 0.9rem 1rem; 
+            text-align: left; 
+            border-bottom: 1px solid rgba(56, 189, 248, 0.12); 
+        }
+        th { 
+            color: #38bdf8; 
+            background: rgba(56, 189, 248, 0.08); 
+            font-weight: 600;
+        }
+        tr:hover { background: rgba(56, 189, 248, 0.04); }
+        .botones { 
+            text-align: center; 
+            margin: 2rem 0; 
+        }
+        button { 
+            background: linear-gradient(135deg, #0284c7, #3b82f6);
+            color: white; 
+            border: none; 
+            padding: 0.9rem 2.2rem; 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            margin: 0.5rem; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            font-weight: 600;
+        }
+        button:hover { 
+            background: linear-gradient(135deg, #0369a1, #2563eb);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+        .mensaje { 
+            text-align: center; 
+            padding: 1rem; 
+            margin: 1rem 0; 
+            border-radius: 10px; 
+            display: none; 
+            font-weight: 500;
+        }
+        .exito { background: rgba(34, 197, 94, 0.15); color: #86efac; display: block; border: 1px solid rgba(74, 222, 128, 0.2); }
+        .error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; display: block; border: 1px solid rgba(248, 113, 113, 0.2); }
+        .oculto { display: none !important; }
+    </style>
+</head>
+<body>
+    
+    <header>
+        <div class="header-contenido">
+            <div>
+                <div class="header-nombre">Natalia Arce</div>
+            </div>
+            <div>
+                <div class="header-titulo">📊 Análisis de Ventas</div>
+            </div>
+            <div></div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="botones">
+            <button onclick="cargarDatos()">📥 Cargar Datos</button>
+            <button onclick="cargarReporte()">📈 Ver Reporte Completo</button>
+        </div>
+
+        <div id="mensaje" class="mensaje"></div>
+
+        <div id="resumen" class="card oculto">
+            <h2>Resumen General</h2>
+            <div class="grid">
+                <div class="stat">
+                    <h3>Facturación Total</h3>
+                    <p id="facturacion">₡0</p>
+                </div>
+                <div class="stat">
+                    <h3>Ticket Promedio</h3>
+                    <p id="ticket">₡0</p>
+                </div>
+                <div class="stat">
+                    <h3>Total Transacciones</h3>
+                    <p id="transacciones">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="productos" class="card oculto">
+            <h2>Productos Más Vendidos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Cantidad</th>
+                        <th>Ingresos Generados</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaProductos"></tbody>
+            </table>
+        </div>
+
+        <div id="ciudades" class="card oculto">
+            <h2>Ventas por Ciudad</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ciudad</th>
+                        <th>Cantidad de Ventas</th>
+                        <th>Total Facturado</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaCiudades"></tbody>
+            </table>
+        </div>
+
+        <div id="vendedores" class="card oculto">
+            <h2>Desempeño de Vendedores</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vendedor</th>
+                        <th>Sucursal</th>
+                        <th>Ventas Realizadas</th>
+                        <th>Total Vendido</th>
+                        <th>Promedio por Venta</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaVendedores"></tbody>
+            </table>
+        </div>
+
+        <div id="clientes" class="card oculto">
+            <h2>Top 5 Clientes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Categoría</th>
+                        <th>Compras Realizadas</th>
+                        <th>Gasto Total</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaClientes"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function mostrarMensaje(texto, tipo = 'exito') {
+            const div = document.getElementById('mensaje');
+            div.textContent = texto;
+            div.className = `mensaje ${tipo}`;
+            setTimeout(() => { div.className = 'mensaje'; }, 5000);
+        }
+
+        async function cargarDatos() {
+            try {
+                const res = await fetch('/api/cargar-datos', { method: 'POST' });
+                const data = await res.json();
+                mostrarMensaje(data.mensaje || '✅ Datos cargados correctamente');
+            } catch (e) {
+                mostrarMensaje('❌ Error al cargar: ' + e, 'error');
+            }
+        }
+
+        async function cargarReporte() {
+            try {
+                const res = await fetch('/api/reporte');
+                if (!res.ok) throw new Error('No se pudo obtener el reporte');
+                const r = await res.json();
+
+                document.getElementById('resumen').classList.remove('oculto');
+                document.getElementById('facturacion').textContent = formatearMoneda(r.facturacionTotal);
+                document.getElementById('ticket').textContent = formatearMoneda(r.ticketPromedio);
+                document.getElementById('transacciones').textContent = r.totalTransacciones;
+
+                llenarTabla('tablaProductos', r.productosMasVendidos, ['producto', 'categoria', 'cantidadVendida', 'ingresos'], ['ingresos']);
+                document.getElementById('productos').classList.remove('oculto');
+
+                llenarTabla('tablaCiudades', r.ventasPorCiudad, ['ciudad', 'cantidadVentas', 'facturacion'], ['facturacion']);
+                document.getElementById('ciudades').classList.remove('oculto');
+
+                llenarTabla('tablaVendedores', r.desempeñoVendedores, ['vendedor', 'sucursal', 'ventasRealizadas', 'totalVendido', 'promedioVenta'], ['totalVendido', 'promedioVenta']);
+                document.getElementById('vendedores').classList.remove('oculto');
+
+                llenarTabla('tablaClientes', r.topClientes, ['cliente', 'categoria', 'compras', 'gastoTotal'], ['gastoTotal']);
+                document.getElementById('clientes').classList.remove('oculto');
+
+                mostrarMensaje('✅ Reporte cargado exitosamente');
+            } catch (e) {
+                mostrarMensaje('❌ Error: ' + e, 'error');
+            }
+        }
+
+        function llenarTabla(idTabla, datos, campos, camposMoneda = []) {
+            const tbody = document.getElementById(idTabla);
+            tbody.innerHTML = '';
+            datos.forEach(fila => {
+                const tr = document.createElement('tr');
+                campos.forEach(campo => {
+                    const td = document.createElement('td');
+                    td.textContent = camposMoneda.includes(campo) 
+                        ? formatearMoneda(fila[campo]) 
+                        : fila[campo];
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function formatearMoneda(valor) {
+            return new Intl.NumberFormat('es-CR', {
+                style: 'currency',
+                currency: 'CRC',
+                minimumFractionDigits: 0
+            }).format(valor);
+        }
+    </script>
+</body>
+</html>
